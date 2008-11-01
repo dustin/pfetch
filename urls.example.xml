@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<!-- Copyright (c) 2008  Dustin Sallings (dustin@spy.net) -->
+
+<urls>
+	<url href="http://www.google.com/" output="/tmp/google.html" freq="10"/>
+	<url href="http://www.yahoo.com/" output="/tmp/yahoo.html" freq="10"/>
+</urls>

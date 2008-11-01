@@ -9,8 +9,8 @@ import os
 import sys
 import random
 
-from twisted.web import client
-from twisted.internet import defer, protocol, reactor
+from twisted.web import client, microdom
+from twisted.internet import defer, task, protocol, reactor
 
 class Download(object):
 
@@ -29,6 +29,13 @@ class Download(object):
             self.__onComplete)
 
 if __name__ == '__main__':
-    Download('http://www.google.com/', '/tmp/google.html')().addBoth(
-        lambda x: reactor.stop())
+    r=random.Random()
+    doc=microdom.parse(sys.argv[1])
+
+    for u in doc.getElementsByTagName("url"):
+        a=u.attributes
+        freq=int(a['freq'])
+        lc=task.LoopingCall(Download(a['href'], a['output']))
+        reactor.callLater(r.randint(0, freq), lc.start, freq)
+
     reactor.run()
