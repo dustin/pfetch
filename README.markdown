@@ -1,4 +1,4 @@
-== pfetch - A Parallel Periodic URL Fetcher Utility ==
+# pfetch - A Parallel Periodic URL Fetcher Utility
 
 This is a really simple twisted app, but it solves a real problem I had, so
 maybe it'll help you, too.
