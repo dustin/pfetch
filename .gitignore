@@ -1,2 +1,4 @@
 *.pyc
 urls.xml
+twistd.pid
+twistd.log
