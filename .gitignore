@@ -1,4 +1,7 @@
+*.6
 *.pyc
-urls.xml
-twistd.pid
+*~
+/pfetch
 twistd.log
+twistd.pid
+urls.xml
