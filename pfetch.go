@@ -45,6 +45,7 @@ func changed(u url, res *http.Response) {
 		log.Printf("Error moving tmp file (%s) into place (%s): %v",
 			tmpfile, u.Output, err)
 	}
+	log.Printf("Updated %s from %s", u.Output, u.HREF)
 	if u.Command.Path != "" {
 		env := append(os.Environ(), fmt.Sprintf("%s=%s", "PFETCH_URL", u.HREF))
 		env = append(env, fmt.Sprintf("%s=%s", "PFETCH_FILE", u.Output))
