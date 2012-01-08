@@ -50,8 +50,9 @@ func changed(u url, res *http.Response) {
 			Args: append([]string{u.Command.Path}, u.Command.Arg...),
 			Env:  env,
 		}
-		if err := cmd.Run(); err != nil {
-			log.Printf("Error running %s: %v", u.Command.Path, err)
+		if output, err := cmd.CombinedOutput(); err != nil {
+			log.Printf("Error running %s: %v\n%s", u.Command.Path, err,
+				string(output))
 		}
 	}
 }
