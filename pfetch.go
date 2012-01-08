@@ -74,6 +74,8 @@ func loop(u url, req *http.Request) {
 			}
 			if res.StatusCode == 200 {
 				changed(u, res)
+			} else {
+				log.Printf("%d for %s", res.StatusCode, u.HREF)
 			}
 		}
 		time.Sleep(freq)
