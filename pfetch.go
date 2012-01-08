@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"log"
+	"log/syslog"
 	"math/rand"
 	"net/http"
 	"os"
@@ -28,6 +28,8 @@ type url struct {
 type urls struct {
 	Url []url
 }
+
+var log = syslog.NewLogger(syslog.LOG_INFO, 0)
 
 func changed(u url, res *http.Response) {
 	tmpfile := strings.Join([]string{u.Output, "tmp"}, ".")
