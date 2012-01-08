@@ -47,7 +47,7 @@ func changed(u url, res *http.Response) {
 		env := append(os.Environ(), fmt.Sprintf("%s=%s", "PFETCH_URL", u.HREF))
 		env = append(env, fmt.Sprintf("%s=%s", "PFETCH_FILE", u.Output))
 		cmd := exec.Cmd{Path: u.Command.Path,
-			Args: u.Command.Arg,
+			Args: append([]string{u.Command.Path}, u.Command.Arg...),
 			Env:  env,
 		}
 		if err := cmd.Run(); err != nil {
