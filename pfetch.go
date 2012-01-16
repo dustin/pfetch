@@ -37,6 +37,7 @@ func changed(u url, res *http.Response) {
 	if err != nil {
 		log.Printf("Error opening %s: %v", tmpfile, err)
 	}
+	defer f.Close()
 	_, cerr := io.Copy(f, res.Body)
 	if cerr != nil {
 		log.Printf("Error copying stream: %v", cerr)
@@ -112,6 +113,7 @@ func main() {
 
 	var result urls
 	xml.Unmarshal(f, &result)
+	f.Close()
 
 	for _, u := range result.Url {
 		schedule(u)
