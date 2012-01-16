@@ -62,6 +62,20 @@ func changed(u url, res *http.Response) {
 	}
 }
 
+func handleResponse(u url, req *http.Request, res *http.Response) {
+	defer res.Body.Close()
+	// Set up conditional request if we got an etag
+	if etag := res.Header.Get("ETag"); etag != "" {
+		req.Header.Set("If-None-Match", etag)
+	}
+	if res.StatusCode == 200 {
+		changed(u, res)
+	} else {
+		log.Printf("%d for %s", res.StatusCode, u.HREF)
+	}
+
+}
+
 func loop(u url, req *http.Request) {
 	freq := time.Duration(u.Freq) * time.Second
 	for {
@@ -70,16 +84,7 @@ func loop(u url, req *http.Request) {
 		if err != nil {
 			log.Printf("Error in response: %v", err)
 		} else {
-			defer res.Body.Close()
-			// Set up conditional request if we got an etag
-			if etag := res.Header.Get("ETag"); etag != "" {
-				req.Header.Set("If-None-Match", etag)
-			}
-			if res.StatusCode == 200 {
-				changed(u, res)
-			} else {
-				log.Printf("%d for %s", res.StatusCode, u.HREF)
-			}
+			handleResponse(u, req, res)
 		}
 		time.Sleep(freq)
 	}
