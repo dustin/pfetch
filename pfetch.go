@@ -31,6 +31,13 @@ type urls struct {
 
 var log = syslog.NewLogger(syslog.LOG_INFO, 0)
 
+func init() {
+	http.DefaultTransport = &http.Transport{
+		Proxy:             http.ProxyFromEnvironment,
+		DisableKeepAlives: true,
+	}
+}
+
 func changed(u url, res *http.Response) {
 	tmpfile := strings.Join([]string{u.Output, "tmp"}, ".")
 	f, err := os.OpenFile(tmpfile, os.O_WRONLY|os.O_CREATE, 0666)
