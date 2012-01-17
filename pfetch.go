@@ -14,19 +14,19 @@ import (
 )
 
 type command struct {
-	Path string   `xml:"attr"`
+	Path string   `xml:"path,attr"`
 	Arg  []string `xml:"arg"`
 }
 
 type url struct {
-	HREF    string `xml:"attr"`
-	Output  string `xml:"attr"`
-	Freq    int    `xml:"attr"`
+	HREF    string `xml:"href,attr"`
+	Output  string `xml:"output,attr"`
+	Freq    int    `xml:"freq,attr"`
 	Command command
 }
 
 type urls struct {
-	Url []url
+	Url []url `xml:"url"`
 }
 
 var log = syslog.NewLogger(syslog.LOG_INFO, 0)
