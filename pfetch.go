@@ -127,6 +127,10 @@ func main() {
 	xml.Unmarshal(f, &result)
 	f.Close()
 
+	if len(result.Url) == 0 {
+		log.Fatalf("No URLs found.")
+	}
+
 	for _, u := range result.Url {
 		schedule(u)
 	}
