@@ -19,10 +19,10 @@ type command struct {
 }
 
 type url struct {
-	HREF    string `xml:"href,attr"`
-	Output  string `xml:"output,attr"`
-	Freq    int    `xml:"freq,attr"`
-	Command command
+	HREF    string  `xml:"href,attr"`
+	Output  string  `xml:"output,attr"`
+	Freq    int     `xml:"freq,attr"`
+	Command command `xml:"command"`
 }
 
 type urls struct {
