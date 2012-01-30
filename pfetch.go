@@ -124,7 +124,7 @@ func main() {
 	}
 
 	var result urls
-	xml.Unmarshal(f, &result)
+	xml.NewDecoder(f).Decode(&result)
 	f.Close()
 
 	if len(result.Url) == 0 {
