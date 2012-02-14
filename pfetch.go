@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	corelog "log"
 	"log/syslog"
 	"math/rand"
 	"net/http"
@@ -29,13 +30,18 @@ type urls struct {
 	Url []url `xml:"url"`
 }
 
-var log = syslog.NewLogger(syslog.LOG_INFO, 0)
+var log *corelog.Logger
 
 func init() {
 	http.DefaultTransport = &http.Transport{
 		Proxy:             http.ProxyFromEnvironment,
 		DisableKeepAlives: true,
 	}
+	l, err := syslog.NewLogger(syslog.LOG_INFO, 0)
+	if err != nil {
+		corelog.Fatal("Can't initialize logger: %v", err)
+	}
+	log = l
 }
 
 func changed(u url, res *http.Response) {
