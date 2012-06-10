@@ -19,11 +19,13 @@ type url struct {
 	HREF    string         `xml:"href,attr"`
 	Output  string         `xml:"output,attr"`
 	RSrc    []string       `xml:"mustmatch"`
+	NRSrc   []string       `xml:"mustnotmatch"`
 	Freq    int            `xml:"freq,attr"`
 	Command command        `xml:"command"`
 	OnError []ErrorHandler `xml:"onerror"`
 
-	matchPatterns []*regexp.Regexp
+	matchPatterns    []*regexp.Regexp
+	negMatchPatterns []*regexp.Regexp
 }
 
 type Notifier struct {
@@ -63,8 +65,13 @@ func loadConfig(path string) {
 	for i, u := range config.Url {
 		u.matchPatterns = make([]*regexp.Regexp, 0, len(u.RSrc))
 		for _, r := range u.RSrc {
-			log.Printf("Compiling %v", r)
 			config.Url[i].matchPatterns = append(config.Url[i].matchPatterns,
+				regexp.MustCompile(r))
+		}
+
+		u.negMatchPatterns = make([]*regexp.Regexp, 0, len(u.NRSrc))
+		for _, r := range u.NRSrc {
+			config.Url[i].negMatchPatterns = append(config.Url[i].negMatchPatterns,
 				regexp.MustCompile(r))
 		}
 

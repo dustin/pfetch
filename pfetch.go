@@ -68,6 +68,14 @@ func changed(u url, res *http.Response) {
 				return
 			}
 		}
+		for i, p := range u.negMatchPatterns {
+			if p.Match(bytes) {
+				handleErrors(u,
+					fmt.Errorf("Matched negative pattern: %v",
+						u.NRSrc[i]))
+				return
+			}
+		}
 	} else {
 		_, cerr := io.Copy(f, res.Body)
 		if cerr != nil {
@@ -145,6 +153,9 @@ func schedule(u url) {
 	}
 	if len(u.RSrc) > 0 {
 		log.Printf("    Will look for %v (%v)", u.RSrc, u.matchPatterns)
+	}
+	if len(u.NRSrc) > 0 {
+		log.Printf("    Will look for not %v (%v)", u.NRSrc, u.negMatchPatterns)
 	}
 
 	req, err := http.NewRequest("GET", u.HREF, strings.NewReader(""))

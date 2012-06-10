@@ -26,6 +26,7 @@ PFETCH_FILE - The file that has the newly fetched data
   <url href="http://www.yahoo.com/" output="/tmp/yahoo.html" freq="10"/>
   <url href="http://something/" freq="10">
     <mustmatch>this regex</mustmatch>
+    <mustnotmatch>another regex</mustnotmatch>
     <onerror notify="myphone"/>
   </url>
 </urls>
