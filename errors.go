@@ -28,21 +28,20 @@ func alertNMA(u url, err error, key, app, pri string) error {
 }
 
 func notifyNamed(u url, err error, name string) {
-	for _, notifier := range config.Notifiers {
-		if notifier.Name == name {
-			if notifier.Type == "nma" && len(notifier.Arg) == 3 {
-				err := alertNMA(u, err,
-					notifier.Arg[0],
-					notifier.Arg[1],
-					notifier.Arg[2])
-				if err != nil {
-					log.Printf("Error sending NMA message: ", err)
-				}
+	notifier := getNamedNotifier(name)
+	if notifier != nil {
+		if notifier.Type == "nma" && len(notifier.Arg) == 3 {
+			err := alertNMA(u, err,
+				notifier.Arg[0],
+				notifier.Arg[1],
+				notifier.Arg[2])
+			if err != nil {
+				log.Printf("Error sending NMA message: ", err)
 			}
-			return
 		}
+	} else {
+		log.Printf("Couldn't find notifier named %v", name)
 	}
-	log.Printf("Couldn't find notifier named %v", name)
 }
 
 func handleErrors(u url, err error) {

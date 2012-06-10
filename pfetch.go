@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/xml"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,43 +10,9 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 	"time"
 )
-
-type command struct {
-	Path string   `xml:"path,attr"`
-	Arg  []string `xml:"arg"`
-}
-
-type ErrorHandler struct {
-	Notify string `xml:"notify,attr"`
-}
-
-type url struct {
-	HREF    string         `xml:"href,attr"`
-	Output  string         `xml:"output,attr"`
-	RSrc    []string       `xml:"mustmatch"`
-	Freq    int            `xml:"freq,attr"`
-	Command command        `xml:"command"`
-	OnError []ErrorHandler `xml:"onerror"`
-
-	matchPatterns []*regexp.Regexp
-}
-
-type Notifier struct {
-	Name string   `xml:"name,attr"`
-	Type string   `xml:"type,attr"`
-	Arg  []string `xml:"arg"`
-}
-
-type pfetchConf struct {
-	Notifiers []Notifier `xml:"notifiers>notifier"`
-	Url       []url      `xml:"url"`
-}
-
-var config pfetchConf
 
 var log *corelog.Logger
 
@@ -194,26 +159,7 @@ func schedule(u url) {
 }
 
 func main() {
-	f, e := os.Open("urls.xml")
-	if e != nil {
-		log.Fatalf("boo:  %v", e)
-	}
-
-	e = xml.NewDecoder(f).Decode(&config)
-	f.Close()
-	if e != nil {
-		log.Fatalf("Error parsing xml: %v", e)
-	}
-
-	for i, u := range config.Url {
-		u.matchPatterns = make([]*regexp.Regexp, 0, len(u.RSrc))
-		for _, r := range u.RSrc {
-			log.Printf("Compiling %v", r)
-			config.Url[i].matchPatterns = append(config.Url[i].matchPatterns,
-				regexp.MustCompile(r))
-		}
-		log.Printf("%v -> %v", u.RSrc, u.matchPatterns)
-	}
+	loadConfig("urls.xml")
 
 	if len(config.Url) == 0 {
 		log.Fatalf("No URLs found.")
