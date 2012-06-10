@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"os"
 	"regexp"
+	"time"
 )
 
 type command struct {
@@ -32,6 +33,8 @@ type Notifier struct {
 	Name string   `xml:"name,attr"`
 	Type string   `xml:"type,attr"`
 	Arg  []string `xml:"arg"`
+
+	alertAfter time.Time
 }
 
 type pfetchConf struct {
@@ -42,9 +45,9 @@ type pfetchConf struct {
 var config pfetchConf
 
 func getNamedNotifier(name string) *Notifier {
-	for _, notifier := range config.Notifiers {
+	for i, notifier := range config.Notifiers {
 		if notifier.Name == name {
-			return &notifier
+			return &config.Notifiers[i]
 		}
 	}
 	return nil
