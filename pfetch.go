@@ -50,14 +50,14 @@ func changed(u *url, res *http.Response) (rv bool) {
 	if len(u.matchPatterns) > 0 {
 		bytes, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Printf("Error reading stream: %v", err)
-			// XXX:  A real error here
+			handleErrors(u,
+				fmt.Errorf("Error reading stream: %v", err))
 			return
 		}
 		_, err = f.Write(bytes)
 		if err != nil {
-			log.Printf("Error writing stream:  %v", err)
-			// XXX:  A real error here
+			handleErrors(u,
+				fmt.Errorf("Error saving results: %v", err))
 			return
 		}
 		for i, p := range u.matchPatterns {
@@ -79,8 +79,8 @@ func changed(u *url, res *http.Response) (rv bool) {
 	} else {
 		_, cerr := io.Copy(f, res.Body)
 		if cerr != nil {
-			log.Printf("Error copying stream: %v", cerr)
-			// XXX:  A real error here.
+			handleErrors(u,
+				fmt.Errorf("Error copying stream: %v", cerr))
 			return
 		}
 	}
@@ -89,8 +89,10 @@ func changed(u *url, res *http.Response) (rv bool) {
 		log.Printf("Verified %s", u.HREF)
 	} else {
 		if err = os.Rename(tmpfile, u.Output); err != nil {
-			log.Printf("Error moving tmp file (%s) into place (%s): %v",
-				tmpfile, u.Output, err)
+			handleErrors(u,
+				fmt.Errorf("Error moving tmp file (%s) into place (%s): %v",
+					tmpfile, u.Output, err))
+			return
 		}
 		log.Printf("Updated %s from %s", u.Output, u.HREF)
 	}
@@ -105,9 +107,11 @@ func changed(u *url, res *http.Response) (rv bool) {
 			Env: env,
 		}
 		if output, err := cmd.CombinedOutput(); err != nil {
-			log.Printf("Error running %s: (%v): %v\n%s",
-				u.Command.Path, u.Command.Arg, err,
-				string(output))
+			handleErrors(u,
+				fmt.Errorf("Error running %s: (%v): %v\n%s",
+					u.Command.Path, u.Command.Arg, err,
+					string(output)))
+			return
 		}
 	}
 	return true

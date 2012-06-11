@@ -100,7 +100,7 @@ func notifier() {
 }
 
 func handleErrors(u *url, err error) {
-	log.Printf("Error in response: %v", err)
+	log.Print(err)
 	notificationChan <- notification{u, err}
 }
 
