@@ -57,7 +57,7 @@ func getNamedNotifier(name string) *Notifier {
 }
 
 func loadConfig(path string) {
-	f, e := os.Open("urls.xml")
+	f, e := os.Open(path)
 	if e != nil {
 		log.Fatalf("Error opening config:  %v", e)
 	}

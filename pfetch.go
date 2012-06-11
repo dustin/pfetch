@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -21,11 +22,6 @@ func init() {
 		Proxy:             http.ProxyFromEnvironment,
 		DisableKeepAlives: true,
 	}
-	_, err := syslog.NewLogger(syslog.LOG_INFO, 0)
-	if err != nil {
-		corelog.Fatal("Can't initialize logger: %v", err)
-	}
-	log = corelog.New(os.Stdout, "pfetch: ", 0)
 }
 
 func changed(u *url, res *http.Response) (rv bool) {
@@ -177,8 +173,27 @@ func schedule(u *url) {
 	}()
 }
 
+func initLogger(slog bool) {
+	if slog {
+		var err error
+		log, err = syslog.NewLogger(syslog.LOG_INFO, 0)
+		if err != nil {
+			corelog.Fatal("Can't initialize logger: %v", err)
+		}
+	} else {
+		log = corelog.New(os.Stdout, "pfetch: ", 0)
+	}
+}
+
 func main() {
-	loadConfig("urls.xml")
+	confPath := flag.String("config", "urls.xml", "Path to config")
+	useSyslog := flag.Bool("syslog", false, "Log to syslog")
+
+	flag.Parse()
+
+	initLogger(*useSyslog)
+
+	loadConfig(*confPath)
 
 	if len(config.Url) == 0 {
 		log.Fatalf("No URLs found.")
