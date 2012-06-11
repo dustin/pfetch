@@ -28,7 +28,7 @@ func init() {
 	log = corelog.New(os.Stdout, "pfetch: ", 0)
 }
 
-func changed(u *url, res *http.Response) {
+func changed(u *url, res *http.Response) (rv bool) {
 	var f io.Writer
 	var tmpfile string
 	var err error
@@ -110,6 +110,7 @@ func changed(u *url, res *http.Response) {
 				string(output))
 		}
 	}
+	return true
 }
 
 func handleResponse(u *url, req *http.Request, res *http.Response) {
@@ -120,8 +121,11 @@ func handleResponse(u *url, req *http.Request, res *http.Response) {
 	}
 	switch res.StatusCode {
 	case 200:
-		changed(u, res)
+		if changed(u, res) {
+			handleSuccess(u)
+		}
 	case 304:
+		handleSuccess(u)
 	default:
 		handleErrors(u, fmt.Errorf("%v", res.Status))
 		log.Printf("%d for %s", res.StatusCode, u.HREF)

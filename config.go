@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/xml"
+	"fmt"
 	"os"
 	"regexp"
 )
@@ -16,13 +17,14 @@ type ErrorHandler struct {
 }
 
 type url struct {
-	HREF    string         `xml:"href,attr"`
-	Output  string         `xml:"output,attr"`
-	RSrc    []string       `xml:"mustmatch"`
-	NRSrc   []string       `xml:"mustnotmatch"`
-	Freq    int            `xml:"freq,attr"`
-	Command command        `xml:"command"`
-	OnError []ErrorHandler `xml:"onerror"`
+	HREF      string         `xml:"href,attr"`
+	Output    string         `xml:"output,attr"`
+	RSrc      []string       `xml:"mustmatch"`
+	NRSrc     []string       `xml:"mustnotmatch"`
+	Freq      int            `xml:"freq,attr"`
+	Command   command        `xml:"command"`
+	OnError   []ErrorHandler `xml:"onerror"`
+	OnRecover []ErrorHandler `xml:"onrecover"`
 
 	matchPatterns    []*regexp.Regexp
 	negMatchPatterns []*regexp.Regexp
@@ -40,6 +42,10 @@ type pfetchConf struct {
 }
 
 var config pfetchConf
+
+func (u *url) String() string {
+	return fmt.Sprintf("{%v -> %#v}", u.HREF, u.Output)
+}
 
 func getNamedNotifier(name string) *Notifier {
 	for i, notifier := range config.Notifiers {
@@ -76,6 +82,12 @@ func loadConfig(path string) {
 		}
 
 		for _, eh := range u.OnError {
+			if getNamedNotifier(eh.Notify) == nil {
+				log.Fatalf("Undefined notifier %#v for url %#v",
+					eh.Notify, u.HREF)
+			}
+		}
+		for _, eh := range u.OnRecover {
 			if getNamedNotifier(eh.Notify) == nil {
 				log.Fatalf("Undefined notifier %#v for url %#v",
 					eh.Notify, u.HREF)
