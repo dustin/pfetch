@@ -28,7 +28,7 @@ func init() {
 	log = corelog.New(os.Stdout, "pfetch: ", 0)
 }
 
-func changed(u url, res *http.Response) {
+func changed(u *url, res *http.Response) {
 	var f io.Writer
 	var tmpfile string
 	var err error
@@ -112,7 +112,7 @@ func changed(u url, res *http.Response) {
 	}
 }
 
-func handleResponse(u url, req *http.Request, res *http.Response) {
+func handleResponse(u *url, req *http.Request, res *http.Response) {
 	defer res.Body.Close()
 	// Set up conditional request if we got an etag
 	if etag := res.Header.Get("ETag"); etag != "" {
@@ -128,7 +128,7 @@ func handleResponse(u url, req *http.Request, res *http.Response) {
 	}
 }
 
-func loop(u url, req *http.Request) {
+func loop(u *url, req *http.Request) {
 	freq := time.Duration(u.Freq) * time.Second
 	for {
 		client := &http.Client{}
@@ -143,7 +143,7 @@ func loop(u url, req *http.Request) {
 	}
 }
 
-func schedule(u url) {
+func schedule(u *url) {
 	freq := time.Duration(u.Freq) * time.Second
 	start := time.Duration(rand.Int31()%int32(u.Freq)) * time.Second
 	log.Printf("Scheduling %s -> %s every %s, starting in %s",
@@ -175,6 +175,8 @@ func main() {
 	if len(config.Url) == 0 {
 		log.Fatalf("No URLs found.")
 	}
+
+	go notifier()
 
 	for _, u := range config.Url {
 		schedule(u)

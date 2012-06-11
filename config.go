@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"os"
 	"regexp"
-	"time"
 )
 
 type command struct {
@@ -33,13 +32,11 @@ type Notifier struct {
 	Name string   `xml:"name,attr"`
 	Type string   `xml:"type,attr"`
 	Arg  []string `xml:"arg"`
-
-	alertAfter time.Time
 }
 
 type pfetchConf struct {
 	Notifiers []Notifier `xml:"notifiers>notifier"`
-	Url       []url      `xml:"url"`
+	Url       []*url     `xml:"url"`
 }
 
 var config pfetchConf

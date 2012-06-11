@@ -8,7 +8,14 @@ import (
 	"github.com/dustin/nma.go"
 )
 
-func alertNMA(u url, err error, key, app, pri string) error {
+type notification struct {
+	u   *url
+	err error
+}
+
+var notificationChan = make(chan notification)
+
+func alertNMA(u *url, err error, key, app, pri string) error {
 	i, e := strconv.Atoi(pri)
 	if e != nil {
 		return e
@@ -28,14 +35,9 @@ func alertNMA(u url, err error, key, app, pri string) error {
 	return n.Notify(&msg)
 }
 
-func notifyNamed(u url, err error, name string) {
+func notifyNamed(u *url, err error, name string) {
 	notifier := getNamedNotifier(name)
 	if notifier != nil {
-		if notifier.alertAfter.After(time.Now()) {
-			log.Printf("Too soon to alert, next up at %v",
-				notifier.alertAfter)
-			return
-		}
 		if notifier.Type == "nma" && len(notifier.Arg) == 3 {
 			err := alertNMA(u, err,
 				notifier.Arg[0],
@@ -45,17 +47,38 @@ func notifyNamed(u url, err error, name string) {
 				log.Printf("Error sending NMA message: ", err)
 			}
 		}
-		notifier.alertAfter = time.Now().Add(time.Hour)
-		log.Printf("Next eligible send: %v", notifier.alertAfter)
 	} else {
 		log.Printf("Couldn't find notifier named %v", name)
 	}
 }
 
-func handleErrors(u url, err error) {
-	log.Printf("Error in response: %v", err)
-	for _, eh := range u.OnError {
-		log.Printf("Sending to %v", eh)
-		notifyNamed(u, err, eh.Notify)
+func notifier() {
+	current := map[*url]time.Time{}
+
+	for notification := range notificationChan {
+
+		now := time.Now()
+		outstanding, found := current[notification.u]
+		if outstanding.Before(now) {
+			if found {
+				delete(current, notification.u)
+			}
+
+			for _, eh := range notification.u.OnError {
+				log.Printf("Sending to %v", eh)
+				notifyNamed(notification.u, notification.err,
+					eh.Notify)
+			}
+
+			current[notification.u] = time.Now().Add(time.Hour)
+		} else {
+			log.Printf("Too soon to alert, next up at %v",
+				outstanding)
+		}
 	}
+}
+
+func handleErrors(u *url, err error) {
+	log.Printf("Error in response: %v", err)
+	notificationChan <- notification{u, err}
 }
