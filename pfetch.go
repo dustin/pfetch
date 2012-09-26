@@ -178,7 +178,7 @@ func initLogger(slog bool) {
 		var err error
 		log, err = syslog.NewLogger(syslog.LOG_INFO, 0)
 		if err != nil {
-			corelog.Fatal("Can't initialize logger: %v", err)
+			corelog.Fatalf("Can't initialize logger: %v", err)
 		}
 	} else {
 		log = corelog.New(os.Stdout, "pfetch: ", 0)

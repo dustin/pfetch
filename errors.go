@@ -42,7 +42,7 @@ func notifyNamed(u *url, msgText, name string) {
 				notifier.Arg[1],
 				notifier.Arg[2])
 			if err != nil {
-				log.Printf("Error sending NMA message: ", err)
+				log.Printf("Error sending NMA message: %v", err)
 			}
 		}
 	} else {
