@@ -79,16 +79,13 @@ func changed(u *url, res *http.Response) (rv bool) {
 		}
 	}
 
-	if u.Output == "" {
-		log.Printf("Verified %s", u.HREF)
-	} else {
+	if u.Output != "" {
 		if err = os.Rename(tmpfile, u.Output); err != nil {
 			handleErrors(u,
 				fmt.Errorf("Error moving tmp file (%s) into place (%s): %v",
 					tmpfile, u.Output, err))
 			return
 		}
-		log.Printf("Updated %s from %s", u.Output, u.HREF)
 	}
 	if u.Command.Path != "" {
 		env := append(os.Environ(),
@@ -135,7 +132,6 @@ func loop(u *url, req *http.Request) {
 	for {
 		client := &http.Client{}
 		res, err := client.Do(req)
-		log.Printf("Grabbing %v", u)
 		if err != nil {
 			handleErrors(u, err)
 		} else {
