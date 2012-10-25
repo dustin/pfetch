@@ -78,7 +78,7 @@ func notifySuccess(current map[*url]time.Time, n notification) {
 	_, found := current[n.u]
 	if found {
 		delete(current, n.u)
-		log.Printf("Was broken. Bringing it back.")
+		log.Printf("%v was broken. Bringing it back.", n.u)
 		for _, eh := range n.u.OnRecover {
 			log.Printf("Sending to %v", eh)
 			notifyNamed(n.u,
