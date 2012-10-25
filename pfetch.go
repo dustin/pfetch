@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	corelog "log"
+	"log"
 	"log/syslog"
 	"math/rand"
 	"net/http"
@@ -14,8 +14,6 @@ import (
 	"strings"
 	"time"
 )
-
-var log *corelog.Logger
 
 func init() {
 	http.DefaultTransport = &http.Transport{
@@ -175,13 +173,12 @@ func schedule(u *url) {
 
 func initLogger(slog bool) {
 	if slog {
-		var err error
-		log, err = syslog.NewLogger(syslog.LOG_INFO, 0)
+		sl, err := syslog.New(syslog.LOG_INFO, "pfetch")
 		if err != nil {
-			corelog.Fatalf("Can't initialize logger: %v", err)
+			log.Fatalf("Can't initialize logger: %v", err)
 		}
-	} else {
-		log = corelog.New(os.Stdout, "pfetch: ", 0)
+		log.SetOutput(sl)
+		log.SetFlags(0)
 	}
 }
 

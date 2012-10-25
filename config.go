@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
+	"log"
 	"os"
 	"regexp"
 )
