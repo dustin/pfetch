@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dustin/nma.go"
+	"github.com/dustin/go-nma"
 )
 
 type notification struct {
