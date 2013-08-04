@@ -28,7 +28,7 @@ func alertNMA(u *url, msgText, key, app, pri string) error {
 		Application: app,
 		Description: msgText,
 		Event:       "pfetch",
-		Priority:    i,
+		Priority:    nma.PriorityLevel(i),
 	}
 
 	return n.Notify(&msg)
