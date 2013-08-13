@@ -128,8 +128,7 @@ func handleResponse(u *url, req *http.Request, res *http.Response) {
 }
 
 func loop(u *url, req *http.Request) {
-	freq := time.Duration(u.Freq) * time.Second
-	for {
+	for _ = range time.Tick(time.Duration(u.Freq) * time.Second) {
 		client := &http.Client{}
 		res, err := client.Do(req)
 		if err != nil {
@@ -137,7 +136,6 @@ func loop(u *url, req *http.Request) {
 		} else {
 			handleResponse(u, req, res)
 		}
-		time.Sleep(freq)
 	}
 }
 
