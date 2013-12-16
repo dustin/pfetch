@@ -42,16 +42,10 @@ func changed(u *url, res *http.Response) (rv bool) {
 	}
 
 	if len(u.matchPatterns) > 0 {
-		bytes, err := ioutil.ReadAll(res.Body)
+		bytes, err := ioutil.ReadAll(io.TeeReader(res.Body, f))
 		if err != nil {
 			handleErrors(u,
 				fmt.Errorf("Error reading stream: %v", err))
-			return
-		}
-		_, err = f.Write(bytes)
-		if err != nil {
-			handleErrors(u,
-				fmt.Errorf("Error saving results: %v", err))
 			return
 		}
 		for i, p := range u.matchPatterns {
