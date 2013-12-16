@@ -152,10 +152,7 @@ func schedule(u *url) {
 		log.Fatalf("Error creating request:  %v", err)
 	}
 
-	go func() {
-		time.Sleep(start)
-		loop(u, req)
-	}()
+	time.AfterFunc(start, func() { go loop(u, req) })
 }
 
 func initLogger(slog bool) {
