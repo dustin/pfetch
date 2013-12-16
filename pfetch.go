@@ -30,7 +30,7 @@ func changed(u *url, res *http.Response) (rv bool) {
 	if u.Output == "" {
 		f = ioutil.Discard
 	} else {
-		tmpfile = strings.Join([]string{u.Output, "tmp"}, ".")
+		tmpfile = u.Output + ".tmp"
 		fd, err := os.OpenFile(tmpfile, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			log.Printf("Error opening %s: %v", tmpfile, err)
