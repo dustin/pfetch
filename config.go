@@ -22,7 +22,7 @@ type url struct {
 	Output    string         `xml:"output,attr"`
 	RSrc      []string       `xml:"mustmatch"`
 	NRSrc     []string       `xml:"mustnotmatch"`
-	Freq      int            `xml:"freq,attr"`
+	Freq      string         `xml:"freq,attr"`
 	Command   command        `xml:"command"`
 	OnError   []errorHandler `xml:"onerror"`
 	OnRecover []errorHandler `xml:"onrecover"`

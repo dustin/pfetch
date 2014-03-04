@@ -120,8 +120,16 @@ func handleResponse(u *url, req *http.Request, res *http.Response) {
 	}
 }
 
+func (u *url) freq() time.Duration {
+	freq, err := time.ParseDuration(u.Freq)
+	if err != nil {
+		log.Fatalf("Error parsing duration %v for %v: %v", u.Freq, u.HREF, err)
+	}
+	return freq
+}
+
 func loop(u *url, req *http.Request) {
-	for _ = range time.Tick(time.Duration(u.Freq) * time.Second) {
+	for _ = range time.Tick(u.freq()) {
 		client := &http.Client{}
 		res, err := client.Do(req)
 		if err != nil {
@@ -133,10 +141,10 @@ func loop(u *url, req *http.Request) {
 }
 
 func schedule(u *url) {
-	freq := time.Duration(u.Freq) * time.Second
-	start := time.Duration(rand.Int31()%int32(u.Freq)) * time.Second
-	log.Printf("Scheduling %s -> %s every %s, starting in %s",
-		u.HREF, u.Output, freq.String(), start.String())
+	freq := u.freq()
+	start := time.Duration(rand.Int31()%int32(freq.Seconds())) * time.Second
+	log.Printf("Scheduling %s -> %s every %v, starting in %v",
+		u.HREF, u.Output, freq, start)
 	if u.Command.Path != "" {
 		log.Printf("    Will run> %s %v", u.Command.Path, u.Command.Arg)
 	}

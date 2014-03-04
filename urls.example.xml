@@ -11,7 +11,7 @@
     </notifier>
   </notifiers>
 
-  <url href="http://www.google.com/" output="/tmp/google.html" freq="10">
+  <url href="http://www.google.com/" output="/tmp/google.html" freq="10s">
     <!-- If a command is defined here, it will be executed with its arguments,
          and the following environment variables:
 
@@ -23,8 +23,8 @@ PFETCH_FILE - The file that has the newly fetched data
       <arg>arg2</arg>
     </command>
   </url>
-  <url href="http://www.yahoo.com/" output="/tmp/yahoo.html" freq="10"/>
-  <url href="http://something/" freq="10">
+  <url href="http://www.yahoo.com/" output="/tmp/yahoo.html" freq="10s"/>
+  <url href="http://something/" freq="10s">
     <mustmatch>this regex</mustmatch>
     <mustnotmatch>another regex</mustnotmatch>
     <onerror notify="myphone"/>
