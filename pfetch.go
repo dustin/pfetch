@@ -45,13 +45,13 @@ func changed(u *url, res *http.Response) (rv bool) {
 		bytes, err := ioutil.ReadAll(io.TeeReader(res.Body, f))
 		if err != nil {
 			handleErrors(u,
-				fmt.Errorf("Error reading stream: %v", err))
+				fmt.Errorf("error reading stream: %v", err))
 			return
 		}
 		for i, p := range u.matchPatterns {
 			if !p.Match(bytes) {
 				handleErrors(u,
-					fmt.Errorf("Failed to match pattern: %v",
+					fmt.Errorf("failed to match pattern: %v",
 						u.RSrc[i]))
 				return
 			}
@@ -59,7 +59,7 @@ func changed(u *url, res *http.Response) (rv bool) {
 		for i, p := range u.negMatchPatterns {
 			if p.Match(bytes) {
 				handleErrors(u,
-					fmt.Errorf("Matched negative pattern: %v",
+					fmt.Errorf("matched negative pattern: %v",
 						u.NRSrc[i]))
 				return
 			}
@@ -68,7 +68,7 @@ func changed(u *url, res *http.Response) (rv bool) {
 		_, cerr := io.Copy(f, res.Body)
 		if cerr != nil {
 			handleErrors(u,
-				fmt.Errorf("Error copying stream: %v", cerr))
+				fmt.Errorf("error copying stream: %v", cerr))
 			return
 		}
 	}
@@ -76,7 +76,7 @@ func changed(u *url, res *http.Response) (rv bool) {
 	if u.Output != "" {
 		if err = os.Rename(tmpfile, u.Output); err != nil {
 			handleErrors(u,
-				fmt.Errorf("Error moving tmp file (%s) into place (%s): %v",
+				fmt.Errorf("error moving tmp file (%s) into place (%s): %v",
 					tmpfile, u.Output, err))
 			return
 		}
@@ -92,7 +92,7 @@ func changed(u *url, res *http.Response) (rv bool) {
 		}
 		if output, err := cmd.CombinedOutput(); err != nil {
 			handleErrors(u,
-				fmt.Errorf("Error running %s: (%v): %v\n%s",
+				fmt.Errorf("error running %s: (%v): %v\n%s",
 					u.Command.Path, u.Command.Arg, err,
 					string(output)))
 			return
@@ -176,13 +176,13 @@ func main() {
 
 	loadConfig(*confPath)
 
-	if len(config.Url) == 0 {
+	if len(config.URL) == 0 {
 		log.Fatalf("No URLs found.")
 	}
 
-	go notifier()
+	go notifyLoop()
 
-	for _, u := range config.Url {
+	for _, u := range config.URL {
 		schedule(u)
 	}
 

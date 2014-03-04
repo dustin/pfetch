@@ -13,7 +13,7 @@ type command struct {
 	Arg  []string `xml:"arg"`
 }
 
-type ErrorHandler struct {
+type errorHandler struct {
 	Notify string `xml:"notify,attr"`
 }
 
@@ -24,22 +24,22 @@ type url struct {
 	NRSrc     []string       `xml:"mustnotmatch"`
 	Freq      int            `xml:"freq,attr"`
 	Command   command        `xml:"command"`
-	OnError   []ErrorHandler `xml:"onerror"`
-	OnRecover []ErrorHandler `xml:"onrecover"`
+	OnError   []errorHandler `xml:"onerror"`
+	OnRecover []errorHandler `xml:"onrecover"`
 
 	matchPatterns    []*regexp.Regexp
 	negMatchPatterns []*regexp.Regexp
 }
 
-type Notifier struct {
+type notifier struct {
 	Name string   `xml:"name,attr"`
 	Type string   `xml:"type,attr"`
 	Arg  []string `xml:"arg"`
 }
 
 type pfetchConf struct {
-	Notifiers []Notifier `xml:"notifiers>notifier"`
-	Url       []*url     `xml:"url"`
+	Notifiers []notifier `xml:"notifiers>notifier"`
+	URL       []*url     `xml:"url"`
 }
 
 var config pfetchConf
@@ -48,7 +48,7 @@ func (u *url) String() string {
 	return fmt.Sprintf("{%v -> %#v}", u.HREF, u.Output)
 }
 
-func getNamedNotifier(name string) *Notifier {
+func getNamedNotifier(name string) *notifier {
 	for i, notifier := range config.Notifiers {
 		if notifier.Name == name {
 			return &config.Notifiers[i]
@@ -69,16 +69,16 @@ func loadConfig(path string) {
 		log.Fatalf("Error parsing xml: %v", e)
 	}
 
-	for i, u := range config.Url {
+	for i, u := range config.URL {
 		u.matchPatterns = make([]*regexp.Regexp, 0, len(u.RSrc))
 		for _, r := range u.RSrc {
-			config.Url[i].matchPatterns = append(config.Url[i].matchPatterns,
+			config.URL[i].matchPatterns = append(config.URL[i].matchPatterns,
 				regexp.MustCompile(r))
 		}
 
 		u.negMatchPatterns = make([]*regexp.Regexp, 0, len(u.NRSrc))
 		for _, r := range u.NRSrc {
-			config.Url[i].negMatchPatterns = append(config.Url[i].negMatchPatterns,
+			config.URL[i].negMatchPatterns = append(config.URL[i].negMatchPatterns,
 				regexp.MustCompile(r))
 		}
 

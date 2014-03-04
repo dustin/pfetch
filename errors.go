@@ -88,7 +88,7 @@ func notifySuccess(current map[*url]time.Time, n notification) {
 	}
 }
 
-func notifier() {
+func notifyLoop() {
 	current := map[*url]time.Time{}
 
 	for n := range notificationChan {
