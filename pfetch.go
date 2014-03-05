@@ -15,6 +15,8 @@ import (
 	"time"
 )
 
+const maxRead = 8 << 20
+
 func init() {
 	http.DefaultTransport = &http.Transport{
 		Proxy:             http.ProxyFromEnvironment,
@@ -41,7 +43,7 @@ func changed(u *url, res *http.Response) bool {
 	}
 
 	if len(u.matchPatterns) > 0 {
-		bytes, err := ioutil.ReadAll(io.TeeReader(res.Body, f))
+		bytes, err := ioutil.ReadAll(io.TeeReader(io.LimitReader(res.Body, maxRead), f))
 		if err != nil {
 			handleErrors(u,
 				fmt.Errorf("error reading stream: %v", err))
