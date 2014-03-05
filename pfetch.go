@@ -22,7 +22,7 @@ func init() {
 	}
 }
 
-func changed(u *url, res *http.Response) (rv bool) {
+func changed(u *url, res *http.Response) bool {
 	var f io.Writer
 	var tmpfile string
 	var err error
@@ -34,8 +34,7 @@ func changed(u *url, res *http.Response) (rv bool) {
 		fd, err := os.OpenFile(tmpfile, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			log.Printf("Error opening %s: %v", tmpfile, err)
-			// XXX:  A real error here.
-			return
+			return false
 		}
 		defer fd.Close()
 		f = fd
@@ -46,14 +45,14 @@ func changed(u *url, res *http.Response) (rv bool) {
 		if err != nil {
 			handleErrors(u,
 				fmt.Errorf("error reading stream: %v", err))
-			return
+			return false
 		}
 		for i, p := range u.matchPatterns {
 			if !p.Match(bytes) {
 				handleErrors(u,
 					fmt.Errorf("failed to match pattern: %v",
 						u.RSrc[i]))
-				return
+				return false
 			}
 		}
 		for i, p := range u.negMatchPatterns {
@@ -61,7 +60,7 @@ func changed(u *url, res *http.Response) (rv bool) {
 				handleErrors(u,
 					fmt.Errorf("matched negative pattern: %v",
 						u.NRSrc[i]))
-				return
+				return false
 			}
 		}
 	} else {
@@ -69,7 +68,7 @@ func changed(u *url, res *http.Response) (rv bool) {
 		if cerr != nil {
 			handleErrors(u,
 				fmt.Errorf("error copying stream: %v", cerr))
-			return
+			return false
 		}
 	}
 
@@ -78,7 +77,7 @@ func changed(u *url, res *http.Response) (rv bool) {
 			handleErrors(u,
 				fmt.Errorf("error moving tmp file (%s) into place (%s): %v",
 					tmpfile, u.Output, err))
-			return
+			return false
 		}
 	}
 	if u.Command.Path != "" {
@@ -95,7 +94,7 @@ func changed(u *url, res *http.Response) (rv bool) {
 				fmt.Errorf("error running %s: (%v): %v\n%s",
 					u.Command.Path, u.Command.Arg, err,
 					string(output)))
-			return
+			return false
 		}
 	}
 	return true
