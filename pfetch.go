@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 )
 
@@ -84,8 +83,8 @@ func changed(u *url, res *http.Response) bool {
 	}
 	if u.Command.Path != "" {
 		env := append(os.Environ(),
-			fmt.Sprintf("%s=%s", "PFETCH_URL", u.HREF),
-			fmt.Sprintf("%s=%s", "PFETCH_FILE", u.Output))
+			"PFETCH_URL="+u.HREF,
+			"PFETCH_FILE="+u.Output)
 		cmd := exec.Cmd{Path: u.Command.Path,
 			Args: append([]string{u.Command.Path},
 				u.Command.Arg...),
@@ -95,7 +94,7 @@ func changed(u *url, res *http.Response) bool {
 			handleErrors(u,
 				fmt.Errorf("error running %s: (%v): %v\n%s",
 					u.Command.Path, u.Command.Arg, err,
-					string(output)))
+					output))
 			return false
 		}
 	}
@@ -156,7 +155,7 @@ func schedule(u *url) {
 		log.Printf("    Will look for not %v (%v)", u.NRSrc, u.negMatchPatterns)
 	}
 
-	req, err := http.NewRequest("GET", u.HREF, strings.NewReader(""))
+	req, err := http.NewRequest("GET", u.HREF, nil)
 	if err != nil {
 		log.Fatalf("Error creating request:  %v", err)
 	}
