@@ -129,7 +129,7 @@ func (u *url) freq() time.Duration {
 }
 
 func loop(u *url, req *http.Request) {
-	for _ = range time.Tick(u.freq()) {
+	for range time.Tick(u.freq()) {
 		client := &http.Client{}
 		res, err := client.Do(req)
 		if err != nil {
